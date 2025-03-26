@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Penjualan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://bukuwarung.com/wp-content/uploads/2020/04/Membuat-Toko-yang-Menarik-1.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.7); /* Background putih dengan transparansi */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h2,
+        h3 {
+            text-align: center;
+            color: #333; /* Warna tulisan judul */
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333; /* Warna teks input */
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #6a4caf; /* Warna hijau untuk tombol */
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #dfff6b; /* Warna saat hover */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50; /* Warna hijau untuk header tabel */
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Warna abu-abu untuk baris genap */
+        }
+
+        tr:hover {
+            background-color: #ddd; /* Warna saat hover */
+        }
+
+        #invoice {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        #recap h4 {
+            color: #4CAF50; /* Warna hijau untuk subjudul rekap */
+        }
+
+        #recapContent {
+            color: #333; /* Warna tulisan untuk konten rekap */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Aplikasi Penjualan Toko</h2>
+
+        <form id="productForm">
+            <h3>Input Data Produk</h3>
+            <input type="text" id="productName" placeholder="Nama Produk" required>
+            <input type="number" id="productStock" placeholder="Stok" required>
+            <input type="number" id="productPrice" placeholder="Harga (Rp)" required>
+            <button type="button" onclick="addProduct()">Tambahkan Produk</button>
+        </form>
+
+        <form id="customerForm">
+            <h3>Input Data Pelanggan</h3>
+            <input type="text" id="customerName" placeholder="Nama Pelanggan" required>
+            <input type="text" id="customerPhone" placeholder="Nomor Telepon" required>
+            <button type="button" onclick="addCustomer()">Tambahkan Pelanggan</button>
+        </form>
+
+        <form id="transactionForm">
+            <h3>Input Transaksi Penjualan</h3>
+            <input type="text" id="transactionProduct" placeholder="Nama Produk" required>
+            <input type="text" id="transactionCustomer" placeholder="Nama Pelanggan" required>
+            <input type="number" id="transactionQuantity" placeholder="Jumlah" min="1" required>
+            <input type="date" id="transactionDate" required>
+            <button type="button" onclick="addTransaction()">Tambahkan Transaksi</button>
+        </form>
+
+        <h3>Cari Informasi Produk</h3>
+        <input type="text" id="searchProduct" placeholder="Cari Nama Produk">
+        <button type="button" onclick="searchProduct()">Cari</button>
+
+        <h3>Hasil Pencarian Produk</h3>
+        <table id="searchResultTable">
+            <thead>
+                <tr>
+                    <th>Nama Produk</th>
+                    <th>Stok</th>
+                    <th>Harga (Rp)</th>
+                </tr>
+            </thead>
+            <tbody id="searchResult"></tbody>
+        </table>
+
+        <h3>Data Produk</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Produk</th>
+                    <th>Stok</th>
+                    <th>Harga (Rp)</th>
+                </tr>
+            </thead>
+            <tbody id="productTable"></tbody>
+        </table>
+
+        <h3>Data Pelanggan</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Pelanggan</th>
+                    <th>Nomor Telepon</th>
+                </tr>
+            </thead>
+            <tbody id="customerTable"></tbody>
+        </table>
+
+        <h3>Laporan Transaksi</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Produk</th>
+                    <th>Nama Pelanggan</th>
+                    <th>Jumlah</th>
+                    <th>Total Harga (Rp)</th>
+                    <th>Tanggal</th>
+                </tr>
+            </thead>
+            <tbody id="transactionTable"></tbody>
+        </table>
+
+        <button type="button" onclick="generateInvoice()">Cetak Faktur</button>
+        <button type="button" onclick="generateRecap()">Rekap Penjualan</button>
+
+        <div id="invoice">
+            <h3>Faktur Penjualan</h3>
+            <div id="invoiceContent"></div>
+        </div>
+
+        <div id="recap" style="display:none; margin-top:20px;">
+            <h3>Rekapitulasi Penjualan</h3>
+            <h4>Harian</h4>
+            <div id="dailyRecapContent"></div>
+            <h4>Bulanan</h4>
+            <div id="monthlyRecapContent"></div>
+            <h4>Tahunan</h4>
+            <div id="yearlyRecapContent"></div>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(value) {
+            return "Rp " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function addProduct() {
+            let name = document.getElementById("productName").value;
+            let stock = document.getElementById("productStock").value;
+            let price = document.getElementById("productPrice").value;
+
+            if (name && stock && price) {
+                let table = document.getElementById("productTable");
+                let row = table.insertRow();
+                row.insertCell(0).innerText = name;
+                row.insertCell(1).innerText = stock;
+                row.insertCell(2).innerText = formatCurrency(price);
+                document.getElementById("productForm").reset();
+            } else {
+                alert("Mohon isi semua data produk!");
+            }
+        }
+
+        function addCustomer() {
+            let name = document.getElementById("customerName").value;
+            let phone = document.getElementById("customerPhone").value;
+
+            if (name && phone) {
+                let table = document.getElementById("customerTable");
+                let row = table.insertRow();
+                row.insertCell(0).innerText = name;
+                row.insertCell(1).innerText = phone;
+                document.getElementById("customerForm").reset();
+            } else {
+                alert("Mohon isi semua data pelanggan!");
+            }
+        }
+
+        function addTransaction() {
+            let customerName = document.getElementById("transactionCustomer").value;
+
+            // Cek apakah nama pelanggan sudah diinput dan terdaftar
+            let customerRows = document.getElementById("customerTable").rows;
+            let customerFound = false;
+
+            for (let i = 0; i < customerRows.length; i++) {
+                if (customerRows[i].cells[0].innerText === customerName) {
+                    customerFound = true;
+                    break;
+                }
+            }
+
+            if (!customerFound) {
+                alert("Nama pelanggan belum terdaftar. Mohon tambahkan pelanggan terlebih dahulu.");
+                return;
+            }
+
+            let product = document.getElementById("transactionProduct").value;
+            let quantity = document.getElementById("transactionQuantity").value;
+            let transactionDate = document.getElementById("transactionDate").value;
+
+            if (product && quantity) {
+                let productRows = document.getElementById("productTable").rows;
+                let productPrice = 0;
+                for (let i = 0; i < productRows.length; i++) {
+                    if (productRows[i].cells[0].innerText === product) {
+                        productPrice = parseInt(productRows[i].cells[2].innerText.replace(/\D/g, ""));
+                        break;
+                    }
+                }
+
+                if (productPrice > 0) {
+                    let totalPrice = productPrice * quantity;
+                    let table = document.getElementById("transactionTable");
+                    let row = table.insertRow();
+                    row.insertCell(0).innerText = product;
+                    row.insertCell(1).innerText = customerName;
+                    row.insertCell(2).innerText = quantity;
+                    row.insertCell(3).innerText = formatCurrency(totalPrice);
+                    row.insertCell(4).innerText = transactionDate; // Tambahkan tanggal
+                    document.getElementById("transactionForm").reset();
+                } else {
+                    alert("Produk tidak ditemukan!");
+                }
+            } else {
+                alert("Mohon isi semua data transaksi!");
+            }
+        }
+
+        function searchProduct() {
+            let searchName = document.getElementById("searchProduct").value.toLowerCase();
+            let productRows = document.getElementById("productTable").rows;
+
+            // Kosongkan hasil pencarian sebelumnya
+            document.getElementById("searchResult").innerHTML = "";
+
+            for (let i = 0; i < productRows.length; i++) {
+                let productName = productRows[i].cells[0].innerText.toLowerCase();
+                if (productName.includes(searchName)) {
+                    let row = document.getElementById("searchResult").insertRow();
+                    row.insertCell(0).innerText = productRows[i].cells[0].innerText;
+                    row.insertCell(1).innerText = productRows[i].cells[1].innerText;
+                    row.insertCell(2).innerText = productRows[i].cells[2].innerText;
+                }
+            }
+
+            if (document.getElementById("searchResult").rows.length === 0) {
+                let row = document.getElementById("searchResult").insertRow();
+                row.insertCell(0).innerText = "Produk tidak ditemukan!";
+                row.insertCell(1).innerText = "";
+                row.insertCell(2).innerText = "";
+            }
+        }
+
+        function generateInvoice() {
+            let transactionRows = document.getElementById("transactionTable").rows;
+            let invoiceContent = "<h3>Detail Transaksi</h3><table style='width: 100%; border-collapse: collapse;'><thead><tr><th>Nama Produk</th><th>Nama Pelanggan</th><th>Jumlah</th><th>Total Harga</th><th>Tanggal</th></tr></thead><tbody>";
+
+            for (let i = 0; i < transactionRows.length; i++) {
+                invoiceContent += "<tr>";
+                for (let j = 0; j < transactionRows[i].cells.length; j++) {
+                    invoiceContent += "<td>" + transactionRows[i].cells[j].innerText + "</td>";
+                }
+                invoiceContent += "</tr>";
+            }
+
+            invoiceContent += "</tbody></table>";
+            document.getElementById("invoiceContent").innerHTML = invoiceContent;
+            document.getElementById("invoice").style.display = "block";
+        }
+
+        function generateRecap() {
+            let transactionRows = document.getElementById("transactionTable").rows;
+            let dailyRecap = {};
+            let monthlyRecap = {};
+            let yearlyRecap = {};
+
+            for (let i = 0; i < transactionRows.length; i++) {
+                let date = new Date(transactionRows[i].cells[4].innerText); // Ambil tanggal
+                let total = parseInt(transactionRows[i].cells[3].innerText.replace(/\D/g, ""));
+
+                // Rekap harian
+                let day = date.toISOString().split('T')[0]; // YYYY-MM-DD
+                if (!dailyRecap[day]) {
+                    dailyRecap[day] = { total: 0, dayName: date.toLocaleDateString('id-ID', { weekday: 'long' }) };
+                }
+                dailyRecap[day].total += total;
+
+                // Rekap bulanan
+                let month = date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0'); // YYYY-MM
+                if (!monthlyRecap[month]) {
+                    monthlyRecap[month] = 0;
+                }
+                monthlyRecap[month] += total;
+
+                // Rekap tahunan
+                let year = date.getFullYear(); // YYYY
+                if (!yearlyRecap[year]) {
+                    yearlyRecap[year] = 0;
+                }
+                yearlyRecap[year] += total;
+            }
+
+            // Tampilkan rekap harian
+            let dailyRecapContent = "<table style='width: 100%; border-collapse: collapse;'><thead><tr><th>Tanggal</th><th>Hari</th><th>Total Penjualan</th></tr></thead><tbody>";
+            for (let date in dailyRecap) {
+                dailyRecapContent += "<tr><td>" + date + "</td><td>" + dailyRecap[date].dayName + "</td><td>" + formatCurrency(dailyRecap[date].total) + "</td></tr>";
+            }
+            dailyRecapContent += "</tbody></table>";
+            document.getElementById("dailyRecapContent").innerHTML = dailyRecapContent;
+
+            // Tampilkan rekap bulanan
+            let monthlyRecapContent = "<table style='width: 100%; border-collapse: collapse;'><thead><tr><th>Bulan</th><th>Total Penjualan</th></tr></thead><tbody>";
+            for (let month in monthlyRecap) {
+                monthlyRecapContent += "<tr><td>" + month + "</td><td>" + formatCurrency(monthlyRecap[month]) + "</td></tr>";
+            }
+            monthlyRecapContent += "</tbody></table>";
+            document.getElementById("monthlyRecapContent").innerHTML = monthlyRecapContent;
+
+            // Tampilkan rekap tahunan
+            let yearlyRecapContent = "<table style='width: 100%; border-collapse: collapse;'><thead><tr><th>Tahun</th><th>Total Penjualan</th></tr></thead><tbody>";
+            for (let year in yearlyRecap) {
+                yearlyRecapContent += "<tr><td>" + year + "</td><td>" + formatCurrency(yearlyRecap[year]) + "</td></tr>";
+            }
+            yearlyRecapContent += "</tbody></table>";
+            document.getElementById("yearlyRecapContent").innerHTML = yearlyRecapContent;
+
+            // Tampilkan recap
+            document.getElementById("recap").style.display = "block";
+        }
+    </script>
+</body>
+
+</html>
